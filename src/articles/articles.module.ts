@@ -8,14 +8,11 @@ import { InMemoryArticlesRepository } from './repositories/in-memory-articles.re
   controllers: [ArticlesController],
   providers: [
     ArticlesService,
-    // Bind the abstract token to the concrete in-memory implementation.
-    // To switch to a DB-backed repository, only change this binding —
-    // the service and controller remain untouched.
     {
       provide: ArticlesRepository,
       useClass: InMemoryArticlesRepository,
     },
   ],
-  exports: [ArticlesService],
+  exports: [ArticlesService, ArticlesRepository],
 })
 export class ArticlesModule {}
