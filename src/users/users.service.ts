@@ -32,7 +32,10 @@ export class UsersService {
     return this.usersRepository.create(dto);
   }
 
-  async updatePassword(id: string, dto: UpdatePasswordDto): Promise<UserResponse> {
+  async updatePassword(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserResponse> {
     this.assertValidUuid(id);
     const user = await this.usersRepository.findById(id);
     if (!user) {

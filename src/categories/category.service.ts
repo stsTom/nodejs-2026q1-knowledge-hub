@@ -11,9 +11,7 @@ import { Category } from './interfaces/category.interface';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
   async findAll(): Promise<Category[]> {
     return this.categoryRepository.findAll();

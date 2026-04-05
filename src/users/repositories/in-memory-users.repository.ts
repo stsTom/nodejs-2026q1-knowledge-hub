@@ -36,7 +36,10 @@ export class InMemoryUsersRepository implements UsersRepository {
     return this.toResponse(user);
   }
 
-  async updatePassword(id: string, dto: UpdatePasswordDto): Promise<UserResponse> {
+  async updatePassword(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserResponse> {
     const user = this.users.get(id);
     const updated: User = {
       ...user,

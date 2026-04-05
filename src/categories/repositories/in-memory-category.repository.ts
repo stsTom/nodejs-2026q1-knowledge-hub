@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { Category } from '../interfaces/category.interface';
 import { CategoryRepository } from '../interfaces/category.repository';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class InMemoryCategoryRepository implements CategoryRepository {
   private categories: Category[] = [
     {
-      id: randomUUID(),
+      id: uuidv4(),
       name: 'Technology',
       description: 'Articles about software, hardware, and digital innovation',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
-      id: randomUUID(),
+      id: uuidv4(),
       name: 'Science',
       description: 'Discoveries, research, and scientific breakthroughs',
       createdAt: new Date(),
@@ -30,9 +30,11 @@ export class InMemoryCategoryRepository implements CategoryRepository {
     return this.categories.find((c) => c.id === id) ?? null;
   }
 
-  async create(data: Pick<Category, 'name' | 'description'>): Promise<Category> {
+  async create(
+    data: Pick<Category, 'name' | 'description'>,
+  ): Promise<Category> {
     const category: Category = {
-      id: randomUUID(),
+      id: uuidv4(),
       name: data.name,
       description: data.description,
       createdAt: new Date(),

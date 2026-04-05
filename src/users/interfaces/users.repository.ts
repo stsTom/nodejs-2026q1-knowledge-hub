@@ -6,6 +6,9 @@ export abstract class UsersRepository {
   abstract findAll(): Promise<UserResponse[]>;
   abstract findById(id: string): Promise<User | undefined>;
   abstract create(dto: CreateUserDto): Promise<UserResponse>;
-  abstract updatePassword(id: string, dto: UpdatePasswordDto): Promise<UserResponse>;
+  abstract updatePassword(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserResponse>;
   abstract delete(id: string): Promise<void>;
 }

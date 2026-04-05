@@ -10,7 +10,7 @@ import { ArticleFilterDto } from '../dto/article-filter.dto';
 export class InMemoryArticlesRepository implements ArticlesRepository {
   private articles: Article[] = [
     {
-      id: '550e8400-e29b-41d4-a716-446655440001',
+      id: uuidv4(),
       title: 'Getting Started with NestJS',
       content: 'NestJS is a progressive Node.js framework...',
       status: ArticleStatus.PUBLISHED,
@@ -21,7 +21,7 @@ export class InMemoryArticlesRepository implements ArticlesRepository {
       updatedAt: new Date('2024-01-01'),
     },
     {
-      id: '550e8400-e29b-41d4-a716-446655440002',
+      id: uuidv4(),
       title: 'Understanding TypeScript Generics',
       content: 'Generics allow you to write flexible, reusable code...',
       status: ArticleStatus.DRAFT,
