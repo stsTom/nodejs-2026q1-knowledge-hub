@@ -4,26 +4,25 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
-  ADMIN
-  EDITOR
-  VIEWER
+  admin
+  editor
+  viewer
 }
 
 enum ArticleStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
+  draft
+  published
+  archived
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   login     String   @unique
   password  String
-  role      Role     @default(VIEWER)
+  role      Role     @default(viewer)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -32,23 +31,23 @@ model User {
 }
 
 model Article {
-  id         Int           @id @default(autoincrement())
+  id         String        @id @default(uuid())
   title      String
   content    String
-  status     ArticleStatus @default(DRAFT)
+  status     ArticleStatus @default(draft)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
   tags       Tag[]
-  author     User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId   Int?
+  author     User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId   String?
   category   Category      @relation(fields: [categoryId], references: [id])
-  categoryId Int 
+  categoryId String 
   comments   Comment[]
 }
 
 model Category {
-  id          Int     @id @default(autoincrement())
+  id          String @id @default(uuid())
   name        String
   description String?
 
@@ -56,18 +55,18 @@ model Category {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
 
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  Int
+  authorId  String
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId Int
+  articleId String
 }
 
 model Tag {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String @unique
 
   articles Article[]

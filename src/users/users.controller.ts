@@ -17,26 +17,22 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // GET /user — get all users
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  // GET /user/:id — get single user by id
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
-  // POST /user — create user
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  // PUT /user/:id — update user's password
   @Put(':id')
   updatePassword(
     @Param('id') id: string,
@@ -45,7 +41,6 @@ export class UsersController {
     return this.usersService.updatePassword(id, updatePasswordDto);
   }
 
-  // DELETE /user/:id — delete user
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {

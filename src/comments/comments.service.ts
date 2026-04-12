@@ -1,10 +1,11 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { CommentsRepository } from './interfaces/comments.repository';
+import { COMMENTS_REPOSITORY, CommentsRepository } from './interfaces/comments.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './interfaces/comment.interface';
 import { ArticlesRepository } from '../articles/interfaces/articles.repository';
@@ -12,15 +13,18 @@ import { ArticlesRepository } from '../articles/interfaces/articles.repository';
 @Injectable()
 export class CommentsService {
   constructor(
+    @Inject(COMMENTS_REPOSITORY)
+
     private readonly commentsRepository: CommentsRepository,
     private readonly articlesRepository: ArticlesRepository,
   ) {}
 
-  getAllByArticleId(articleId: string): Comment[] {
-    return this.commentsRepository.findAllByArticleId(articleId);
+  async getAllByArticleId(articleId: string): Promise<Comment[]> {
+    const comments = await this.commentsRepository.findAllByArticleId(articleId);
+    return comments
   }
 
-  create(dto: CreateCommentDto): Comment {
+  async create(dto: CreateCommentDto): Promise<Comment> {
     const article = this.articlesRepository.findById(dto.articleId);
     if (!article) {
       throw new UnprocessableEntityException(

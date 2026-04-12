@@ -1,14 +1,16 @@
-export enum UserRole {
-  ADMIN = 'admin',
-  EDITOR = 'editor',
-  VIEWER = 'viewer',
-}
+// export enum UserRole {
+//   ADMIN = 'admin',
+//   EDITOR = 'editor',
+//   VIEWER = 'viewer',
+// }
+
+export { Role } from '@prisma/client';
 
 export interface User {
   id: string; // uuid v4
   login: string;
   password: string;
-  role: UserRole;
+  role: import('@prisma/client').Role;
   createdAt: number; // timestamp of creation
   updatedAt: number; // timestamp of last update
 }

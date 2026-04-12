@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum, IsOptional } from 'class-validator';
-import { UserRole } from '../interfaces/user.interface';
+import { Role } from '@prisma/client';
 
 export class CreateUserDto {
   @IsString()
@@ -11,8 +11,8 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(UserRole, {
-    message: `role must be one of: ${Object.values(UserRole).join(', ')}`,
+  @IsEnum(Role, {
+    message: `role must be one of: ${Object.values(Role).join(', ')}`,
   })
-  role?: UserRole;
+  role?: Role;
 }

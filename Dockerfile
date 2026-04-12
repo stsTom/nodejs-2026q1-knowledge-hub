@@ -14,7 +14,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
-EXPOSE 3000
+RUN npx prisma generate
+EXPOSE 4000
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
