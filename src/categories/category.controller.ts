@@ -18,28 +18,24 @@ import { Category } from './interfaces/category.interface';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  // GET /category — 200 + all categories
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(): Promise<Category[]> {
     return this.categoryService.findAll();
   }
 
-  // GET /category/:id — 200, 400 (invalid uuid), 404 (not found)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findById(@Param('id') id: string): Promise<Category> {
     return this.categoryService.findById(id);
   }
 
-  // POST /category — 201 + created record, 400 (missing required fields)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateCategoryDto): Promise<Category> {
     return this.categoryService.create(dto);
   }
 
-  // PUT /category/:id — 200 + updated record, 400, 404
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
@@ -49,7 +45,6 @@ export class CategoryController {
     return this.categoryService.update(id, dto);
   }
 
-  // DELETE /category/:id — 204 (deleted), 400, 404
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {

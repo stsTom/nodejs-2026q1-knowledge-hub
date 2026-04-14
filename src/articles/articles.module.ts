@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ArticlesController } from './articles.controller';
 import { ArticlesService } from './articles.service';
 import { ArticlesRepository } from './interfaces/articles.repository';
-import { InMemoryArticlesRepository } from './repositories/in-memory-articles.repository';
+import { PrismaArticlesRepository } from './repositories/prisma-articles.repository'
 
 @Module({
   controllers: [ArticlesController],
@@ -10,7 +10,7 @@ import { InMemoryArticlesRepository } from './repositories/in-memory-articles.re
     ArticlesService,
     {
       provide: ArticlesRepository,
-      useClass: InMemoryArticlesRepository,
+      useClass: PrismaArticlesRepository,
     },
   ],
   exports: [ArticlesService, ArticlesRepository],

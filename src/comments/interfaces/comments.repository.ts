@@ -1,8 +1,10 @@
 import { Comment } from './comment.interface';
 
-export abstract class CommentsRepository {
-  abstract findAllByArticleId(articleId: string): Comment[];
-  abstract findById(id: string): Comment | undefined;
-  abstract create(comment: Comment): Comment;
-  abstract delete(id: string): void;
+export const COMMENTS_REPOSITORY = 'COMMENTS_REPOSITORY'
+
+export interface CommentsRepository {
+  findAllByArticleId(articleId: string): Promise<Comment[]>;
+  findById(id: string): Promise<Comment | undefined>;
+  create(comment: Comment): Promise<Comment>;
+  delete(id: string): Promise<void>;
 }
