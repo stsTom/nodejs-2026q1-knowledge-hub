@@ -82,3 +82,6 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Image link
+https://hub.docker.com/repository/docker/ststom/knowledge-hub-app/tags/v3.0/sha256-4664654cac6d477d6019181bd680fcbc262bfa771f8e346c8d30d37eb5c1c52b
