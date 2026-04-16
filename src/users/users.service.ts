@@ -28,6 +28,10 @@ export class UsersService {
     return response;
   }
 
+  async findByLogin(login: string): Promise<UserResponse> { //should the password be sent here?
+    return this.usersRepository.findByLogin(login);
+  }
+
   async create(dto: CreateUserDto): Promise<UserResponse> {
     return this.usersRepository.create(dto);
   }

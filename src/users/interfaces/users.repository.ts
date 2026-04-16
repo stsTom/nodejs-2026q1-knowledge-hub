@@ -5,6 +5,7 @@ import { UpdatePasswordDto } from '../dto/update-password.dto';
 export abstract class UsersRepository {
   abstract findAll(): Promise<UserResponse[]>;
   abstract findById(id: string): Promise<User | undefined>;
+  abstract findByLogin(login: string): Promise<User | undefined>;
   abstract create(dto: CreateUserDto): Promise<UserResponse>;
   abstract updatePassword(
     id: string,

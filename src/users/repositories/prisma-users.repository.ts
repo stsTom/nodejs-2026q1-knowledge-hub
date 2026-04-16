@@ -32,6 +32,11 @@ export class PrismaUsersRepository implements UsersRepository {
     return user ? toUser(user) : undefined;
   }
 
+  async findByLogin(login: string): Promise<User | undefined> {
+    const user = await this.prisma.user.findUnique({ where: { login } });
+    return user ? toUser(user) : undefined
+  }
+
   async create(dto: CreateUserDto): Promise<UserResponse> {
     const user = await this.prisma.user.create({
       data: {
