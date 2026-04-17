@@ -8,7 +8,7 @@ import { validate as isUuid } from 'uuid';
 import { UsersRepository } from './interfaces/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserResponse } from './interfaces/user.interface';
+import { User, UserResponse } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +28,7 @@ export class UsersService {
     return response;
   }
 
-  async findByLogin(login: string): Promise<UserResponse> { //should the password be sent here?
+  async findByLogin(login: string): Promise<User | undefined> {
     return this.usersRepository.findByLogin(login);
   }
 
