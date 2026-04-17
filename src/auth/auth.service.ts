@@ -4,6 +4,7 @@ import { AuthDto } from "./dto/auth.dto";
 import { JwtService } from "@nestjs/jwt";
 import { RefreshDto } from "./dto/refresh.dto";
 import { verify } from "jsonwebtoken";
+import bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
@@ -26,11 +27,15 @@ export class AuthService {
   async login(dto: AuthDto){
     const user = await this.userService.findByLogin(dto.login)
 
-    if (!user || dto.password !== user.password) {
+    if (!user || !bcrypt.compare(dto.password, user.password)) {
       throw new ForbiddenException(`${dto.login} doesn't exist or password is invalid`)
     }
 
-    const payload = { sub: user.id }
+    const payload = {
+      'sub': user.id,
+      'login': user.login,
+      'role': user.role
+    }
     const tokens = await this.createTokens(payload)
     
     return tokens

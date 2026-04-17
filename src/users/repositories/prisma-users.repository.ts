@@ -4,6 +4,7 @@ import { User, UserResponse } from '../interfaces/user.interface';
 import { UsersRepository } from '../interfaces/users.repository';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
+import bcrypt from 'bcrypt'
 
 function toUser(raw: any): User {
   return {
@@ -38,10 +39,13 @@ export class PrismaUsersRepository implements UsersRepository {
   }
 
   async create(dto: CreateUserDto): Promise<UserResponse> {
+    const saltRounds = 10
+    const hash = await bcrypt.hash(dto.password, saltRounds)
+
     const user = await this.prisma.user.create({
       data: {
         login: dto.login,
-        password: dto.password,
+        password: hash,
         role: dto.role,
       },
     });
