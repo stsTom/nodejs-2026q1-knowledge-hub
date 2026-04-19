@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { verify } from 'jsonwebtoken';
+import { TokenPayload } from '../auth/auth.service';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -35,9 +36,10 @@ export class JwtAuthGuard implements CanActivate {
     const token = authHeader.slice(7);
 
     try {
-      const payload = verify(token, process.env.JWT_SECRET_KEY) as Record<string, unknown>;
+      const payload = verify(token, process.env.JWT_SECRET_KEY) as TokenPayload;
+
       request.user = {
-        id: payload.sub,
+        id: payload.userId,
         login: payload.login,
         role: payload.role,
       };

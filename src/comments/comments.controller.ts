@@ -28,6 +28,16 @@ export class CommentsController {
     return this.commentsService.getAllByArticleId(articleId);
   }
 
+  @Get(':id')
+  @Roles(Role.viewer, Role.editor, Role.admin)
+  @HttpCode(HttpStatus.OK)
+  getById(@Param('id') id: string) {
+    if (!isUuid(id)) {
+      throw new BadRequestException(`"${id}" is not a valid UUID`);
+    }
+    return this.commentsService.findById(id);
+  }
+
   @Post()
   @Roles(Role.editor, Role.admin)
   @HttpCode(HttpStatus.CREATED)
@@ -39,12 +49,15 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  @Roles(Role.admin)
+  @Roles(Role.editor, Role.admin)
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id') id: string) {
+  async delete(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     if (!isUuid(id)) {
       throw new BadRequestException(`"${id}" is not a valid UUID`);
     }
-    this.commentsService.delete(id);
+    await this.commentsService.delete(id, user);
   }
 }

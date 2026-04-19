@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { validate as isUuid } from 'uuid';
 import { Role } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import { UsersRepository } from './interfaces/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -53,9 +54,12 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with id "${id}" not found`);
     }
-    if (user.password !== dto.oldPassword) {
+
+    const passwordMatches = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!passwordMatches) {
       throw new ForbiddenException('Old password is incorrect');
     }
+
     return this.usersRepository.updatePassword(id, dto);
   }
 

@@ -1,10 +1,12 @@
 import {
   Inject,
   Injectable,
+  ForbiddenException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { Role } from '@prisma/client';
 import { COMMENTS_REPOSITORY, CommentsRepository } from './interfaces/comments.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './interfaces/comment.interface';
@@ -21,6 +23,15 @@ export class CommentsService {
 
   async getAllByArticleId(articleId: string): Promise<Comment[]> {
     return this.commentsRepository.findAllByArticleId(articleId);
+  }
+
+  // FIX: added to support the new GET /comment/:id controller route
+  async findById(id: string): Promise<Comment> {
+    const comment = await this.commentsRepository.findById(id);
+    if (!comment) {
+      throw new NotFoundException(`Comment with id "${id}" not found`);
+    }
+    return comment;
   }
 
   async create(dto: CreateCommentDto, user: AuthenticatedUser): Promise<Comment> {
@@ -42,11 +53,16 @@ export class CommentsService {
     return this.commentsRepository.create(comment);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, user: AuthenticatedUser): Promise<void> {
     const existing = await this.commentsRepository.findById(id);
     if (!existing) {
       throw new NotFoundException(`Comment with id "${id}" not found`);
     }
+
+    if (user.role === Role.editor && existing.authorId !== user.id) {
+      throw new ForbiddenException("You can only delete your own comments");
+    }
+
     await this.commentsRepository.delete(id);
   }
 }
