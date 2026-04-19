@@ -5,10 +5,12 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { validate as isUuid } from 'uuid';
+import { Role } from '@prisma/client';
 import { UsersRepository } from './interfaces/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User, UserResponse } from './interfaces/user.interface';
+import { AuthenticatedUser } from '../rbac/current-user.decorator';
 
 @Injectable()
 export class UsersService {
@@ -39,8 +41,14 @@ export class UsersService {
   async updatePassword(
     id: string,
     dto: UpdatePasswordDto,
+    requester: AuthenticatedUser,
   ): Promise<UserResponse> {
     this.assertValidUuid(id);
+
+    if (requester.role === Role.editor && requester.id !== id) {
+      throw new ForbiddenException('You can only update your own password');
+    }
+
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`User with id "${id}" not found`);
