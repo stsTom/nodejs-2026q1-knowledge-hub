@@ -5,10 +5,13 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { validate as isUuid } from 'uuid';
+import { Role } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import { UsersRepository } from './interfaces/users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UserResponse } from './interfaces/user.interface';
+import { User, UserResponse } from './interfaces/user.interface';
+import { AuthenticatedUser } from '../rbac/current-user.decorator';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +31,10 @@ export class UsersService {
     return response;
   }
 
+  async findByLogin(login: string): Promise<User | undefined> {
+    return this.usersRepository.findByLogin(login);
+  }
+
   async create(dto: CreateUserDto): Promise<UserResponse> {
     return this.usersRepository.create(dto);
   }
@@ -35,15 +42,24 @@ export class UsersService {
   async updatePassword(
     id: string,
     dto: UpdatePasswordDto,
+    requester: AuthenticatedUser,
   ): Promise<UserResponse> {
     this.assertValidUuid(id);
+
+    if (requester.role === Role.editor && requester.id !== id) {
+      throw new ForbiddenException('You can only update your own password');
+    }
+
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`User with id "${id}" not found`);
     }
-    if (user.password !== dto.oldPassword) {
+
+    const passwordMatches = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!passwordMatches) {
       throw new ForbiddenException('Old password is incorrect');
     }
+
     return this.usersRepository.updatePassword(id, dto);
   }
 

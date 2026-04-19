@@ -1,27 +1,41 @@
 import {
+  Inject,
   Injectable,
+  ForbiddenException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { CommentsRepository } from './interfaces/comments.repository';
+import { Role } from '@prisma/client';
+import { COMMENTS_REPOSITORY, CommentsRepository } from './interfaces/comments.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './interfaces/comment.interface';
 import { ArticlesRepository } from '../articles/interfaces/articles.repository';
+import { AuthenticatedUser } from '../rbac/current-user.decorator';
 
 @Injectable()
 export class CommentsService {
   constructor(
+    @Inject(COMMENTS_REPOSITORY)
     private readonly commentsRepository: CommentsRepository,
     private readonly articlesRepository: ArticlesRepository,
   ) {}
 
-  getAllByArticleId(articleId: string): Comment[] {
+  async getAllByArticleId(articleId: string): Promise<Comment[]> {
     return this.commentsRepository.findAllByArticleId(articleId);
   }
 
-  create(dto: CreateCommentDto): Comment {
-    const article = this.articlesRepository.findById(dto.articleId);
+  // FIX: added to support the new GET /comment/:id controller route
+  async findById(id: string): Promise<Comment> {
+    const comment = await this.commentsRepository.findById(id);
+    if (!comment) {
+      throw new NotFoundException(`Comment with id "${id}" not found`);
+    }
+    return comment;
+  }
+
+  async create(dto: CreateCommentDto, user: AuthenticatedUser): Promise<Comment> {
+    const article = await this.articlesRepository.findById(dto.articleId);
     if (!article) {
       throw new UnprocessableEntityException(
         `Article with id "${dto.articleId}" does not exist`,
@@ -32,18 +46,23 @@ export class CommentsService {
       id: uuidv4(),
       content: dto.content,
       articleId: dto.articleId,
-      authorId: dto.authorId ?? null,
+      authorId: user.id,
       createdAt: Date.now(),
     };
 
     return this.commentsRepository.create(comment);
   }
 
-  delete(id: string): void {
-    const existing = this.commentsRepository.findById(id);
+  async delete(id: string, user: AuthenticatedUser): Promise<void> {
+    const existing = await this.commentsRepository.findById(id);
     if (!existing) {
       throw new NotFoundException(`Comment with id "${id}" not found`);
     }
-    this.commentsRepository.delete(id);
+
+    if (user.role === Role.editor && existing.authorId !== user.id) {
+      throw new ForbiddenException("You can only delete your own comments");
+    }
+
+    await this.commentsRepository.delete(id);
   }
 }

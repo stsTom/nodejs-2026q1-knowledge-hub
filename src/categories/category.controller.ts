@@ -9,38 +9,40 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './interfaces/category.interface';
+import { Roles } from '../rbac/roles.decorator';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  // GET /category — 200 + all categories
   @Get()
+  @Roles(Role.viewer, Role.editor, Role.admin)
   @HttpCode(HttpStatus.OK)
   async findAll(): Promise<Category[]> {
     return this.categoryService.findAll();
   }
 
-  // GET /category/:id — 200, 400 (invalid uuid), 404 (not found)
   @Get(':id')
+  @Roles(Role.viewer, Role.editor, Role.admin)
   @HttpCode(HttpStatus.OK)
   async findById(@Param('id') id: string): Promise<Category> {
     return this.categoryService.findById(id);
   }
 
-  // POST /category — 201 + created record, 400 (missing required fields)
   @Post()
+  @Roles(Role.admin)
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateCategoryDto): Promise<Category> {
     return this.categoryService.create(dto);
   }
 
-  // PUT /category/:id — 200 + updated record, 400, 404
   @Put(':id')
+  @Roles(Role.admin)
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: string,
@@ -49,8 +51,8 @@ export class CategoryController {
     return this.categoryService.update(id, dto);
   }
 
-  // DELETE /category/:id — 204 (deleted), 400, 404
   @Delete(':id')
+  @Roles(Role.admin)
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string): Promise<void> {
     return this.categoryService.delete(id);
